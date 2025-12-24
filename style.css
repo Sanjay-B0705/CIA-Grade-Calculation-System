@@ -1,0 +1,434 @@
+:root {
+    --primary-hue: 220;
+    /* Royal Blue */
+    --primary: hsl(var(--primary-hue), 90%, 50%);
+    --primary-dark: hsl(var(--primary-hue), 90%, 35%);
+    --primary-light: hsl(var(--primary-hue), 80%, 90%);
+    --accent: hsl(340, 80%, 55%);
+    /* Pink/Red accent */
+    --bg-dark: hsl(220, 20%, 10%);
+    --bg-card: hsla(220, 20%, 15%, 0.7);
+    --text-white: hsl(0, 0%, 100%);
+    --text-dim: hsl(220, 10%, 70%);
+    --glass-border: hsla(0, 0%, 100%, 0.1);
+    --glass-shiny: hsla(0, 0%, 100%, 0.05);
+
+    --success: hsl(150, 70%, 45%);
+    --danger: hsl(0, 70%, 55%);
+    --warning: hsl(40, 90%, 50%);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-white);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    padding-bottom: 2rem;
+}
+
+/* Background Animation */
+.background-globes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.globe {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.4;
+    animation: float 10s infinite alternate ease-in-out;
+}
+
+.globe-1 {
+    width: 300px;
+    height: 300px;
+    background: var(--primary);
+    top: -50px;
+    left: -50px;
+}
+
+.globe-2 {
+    width: 400px;
+    height: 400px;
+    background: var(--accent);
+    bottom: -100px;
+    right: -100px;
+    animation-delay: -5s;
+}
+
+@keyframes float {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    100% {
+        transform: translate(30px, 30px);
+    }
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 2rem 0;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #fff, var(--primary-light));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header .subtitle {
+    display: block;
+    font-size: 1.1rem;
+    color: var(--accent);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 0.5rem;
+}
+
+.grid-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Glass Card Styles */
+.glass-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-2px);
+    border-color: hsla(0, 0%, 100%, 0.3);
+}
+
+.wide-card {
+    grid-column: 1 / -1;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 0.5rem;
+}
+
+.card-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.badge {
+    background: var(--glass-shiny);
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--primary-light);
+    border: 1px solid var(--glass-border);
+}
+
+.input-group {
+    margin-bottom: 1.2rem;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.8rem;
+    background: hsla(0, 0%, 0%, 0.3);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px hsla(var(--primary-hue), 90%, 50%, 0.3);
+}
+
+.hint {
+    display: block;
+    margin-top: 0.3rem;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    opacity: 0.8;
+}
+
+.error label {
+    color: var(--danger);
+}
+
+.error input {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px hsla(0, 70%, 55%, 0.2);
+}
+
+.result-mini {
+    margin-top: 1rem;
+    padding: 0.8rem;
+    background: var(--glass-shiny);
+    border-radius: 12px;
+    text-align: right;
+    font-size: 0.9rem;
+}
+
+.result-mini strong {
+    color: var(--primary-light);
+    font-size: 1.1rem;
+    margin-left: 0.5rem;
+}
+
+.controls {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin: 1rem 0;
+}
+
+.btn {
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s;
+}
+
+.btn.primary {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 4px 15px hsla(var(--primary-hue), 90%, 50%, 0.4);
+}
+
+.btn.primary:hover {
+    background: var(--primary-dark);
+    transform: scale(1.05);
+}
+
+.btn.secondary {
+    background: transparent;
+    color: #fff;
+    border: 1px solid var(--glass-border);
+}
+
+.btn.secondary:hover {
+    background: var(--glass-shiny);
+}
+
+/* Result Card */
+.result-card {
+    grid-column: 1 / -1;
+    text-align: center;
+    background: linear-gradient(135deg, hsla(220, 20%, 20%, 0.9), hsla(220, 20%, 15%, 0.9));
+    border: 1px solid var(--primary);
+    box-shadow: 0 0 30px hsla(var(--primary-hue), 90%, 50%, 0.1);
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.result-item {
+    padding: 1rem;
+    background: var(--glass-shiny);
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.result-item .label {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+}
+
+.result-item .value {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.highlight-blue .value {
+    color: var(--primary);
+}
+
+.highlight-main .value {
+    color: var(--accent);
+    font-size: 1.8rem;
+}
+
+.grade-outcome {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: hsla(0, 0%, 0%, 0.2);
+    border-radius: 15px;
+}
+
+.grade-box h1 {
+    font-size: 3.5rem;
+    color: #fff;
+    line-height: 1;
+}
+
+.status-box h2 {
+    font-size: 2.5rem;
+    line-height: 1;
+}
+
+.pass {
+    color: var(--success);
+}
+
+.fail {
+    color: var(--danger);
+}
+
+.breakdown-details {
+    text-align: left;
+    margin-top: 1rem;
+    color: var(--text-dim);
+}
+
+.breakdown-details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--primary-light);
+    margin-bottom: 0.5rem;
+}
+
+.breakdown-details ul {
+    list-style: none;
+    padding-left: 1rem;
+    border-left: 2px solid var(--glass-border);
+}
+
+.breakdown-details li {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.warning-msg {
+    color: var(--warning);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    font-weight: 600;
+}
+
+@media (max-width: 600px) {
+    .grade-outcome {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+@media print {
+
+    .background-globes,
+    .controls,
+    footer,
+    .hint,
+    .warning-msg {
+        display: none !important;
+    }
+
+    body {
+        background: #fff;
+        color: #000;
+    }
+
+    .glass-card {
+        background: none;
+        backdrop-filter: none;
+        box-shadow: none;
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
+        margin-bottom: 20px;
+    }
+
+    .header h1 {
+        -webkit-text-fill-color: black;
+        background: none;
+        color: black;
+    }
+
+    input {
+        border: none;
+        background: transparent;
+        color: black;
+        padding: 0;
+    }
+
+    .result-card {
+        background: #fff;
+        border: 2px solid #000;
+        color: #000;
+    }
+
+    .result-item,
+    .grade-outcome {
+        background: none;
+        border: 1px solid #eee;
+    }
+
+    .result-item .value {
+        color: #000;
+    }
+
+    #disp-grade,
+    #disp-status {
+        color: #000 !important;
+    }
+}

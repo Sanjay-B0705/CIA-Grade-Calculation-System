@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student CIA & Grade Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-globes">
+        <div class="globe globe-1"></div>
+        <div class="globe globe-2"></div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo-area">
+                <h1></h1>
+                <span class="subtitle">Student Academic Portal</span>
+            </div>
+            <p class="description">UG B.Tech CIA & Grade Calculation System</p>
+        </header>
+
+        <main class="grid-layout">
+            <!-- Assessment 1 -->
+            <div class="card glass-card">
+                <div class="card-header">
+                    <h2>Assessment 1</h2>
+                    <span class="badge">Max 100</span>
+                </div>
+                <div class="input-group">
+                    <label for="a1-raw">Raw Marks (Max 30)</label>
+                    <input type="number" id="a1-raw" min="0" max="30" placeholder="0-30">
+                    <small class="hint">Converts to 90</small>
+                </div>
+                <div class="input-group">
+                    <label for="a1-notes">Cluster / Notes (Max 10)</label>
+                    <input type="number" id="a1-notes" min="0" max="10" placeholder="0-10">
+                </div>
+                <div class="result-mini" id="res-a1">
+                    <span>Converted:</span> <strong>0 / 100</strong>
+                </div>
+            </div>
+
+            <!-- Assessment 2 -->
+            <div class="card glass-card">
+                <div class="card-header">
+                    <h2>Assessment 2</h2>
+                    <span class="badge">Max 100</span>
+                </div>
+                <div class="input-group">
+                    <label for="a2-raw">Raw Marks (Max 50)</label>
+                    <input type="number" id="a2-raw" min="0" max="50" placeholder="0-50">
+                    <small class="hint">Converts to 70</small>
+                </div>
+                <div class="input-group">
+                    <label for="a2-mcq">MCQ Test (Max 20)</label>
+                    <input type="number" id="a2-mcq" min="0" max="20" placeholder="0-20">
+                </div>
+                <div class="input-group">
+                    <label for="a2-cluster">Cluster / Classwork (Max 10)</label>
+                    <input type="number" id="a2-cluster" min="0" max="10" placeholder="0-10">
+                </div>
+                <div class="result-mini" id="res-a2">
+                    <span>Converted:</span> <strong>0 / 100</strong>
+                </div>
+            </div>
+
+            <!-- Assessment 3 -->
+            <div class="card glass-card">
+                <div class="card-header">
+                    <h2>Assessment 3</h2>
+                    <span class="badge">Max 100</span>
+                </div>
+                <div class="input-group">
+                    <label for="a3-raw">Raw Marks (Max 100)</label>
+                    <input type="number" id="a3-raw" min="0" max="100" placeholder="0-100">
+                    <small class="hint">Converts to 70</small>
+                </div>
+                <div class="input-group">
+                    <label for="a3-assign">Assignment (Max 20)</label>
+                    <input type="number" id="a3-assign" min="0" max="20" placeholder="0-20">
+                </div>
+                <div class="input-group">
+                    <label for="a3-cluster">Cluster / Classwork (Max 10)</label>
+                    <input type="number" id="a3-cluster" min="0" max="10" placeholder="0-10">
+                </div>
+                <div class="result-mini" id="res-a3">
+                    <span>Converted:</span> <strong>0 / 100</strong>
+                </div>
+            </div>
+
+            <!-- End Semester -->
+            <div class="card glass-card wide-card">
+                <div class="card-header">
+                    <h2>End Semester Exam (ESE)</h2>
+                    <span class="badge">Pass ≥ 40</span>
+                </div>
+                <div class="input-group-row">
+                    <div class="input-group">
+                        <label for="ese-raw">ESE Raw Marks (Max 100)</label>
+                        <input type="number" id="ese-raw" min="0" max="100" placeholder="0-100">
+                    </div>
+                </div>
+                <div class="warning-msg" id="ese-warning" style="display: none;">
+                    * Minimum 40 marks required in ESE to pass.
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <button id="calc-btn" class="btn primary">Calculate Grade</button>
+                <button id="reset-btn" class="btn secondary">Reset</button>
+            </div>
+
+            <!-- Final Result -->
+            <div class="card result-card glass-card" id="final-result">
+                <div class="result-header">
+                    <h3>Academic Performance Summary</h3>
+                </div>
+                <div class="result-grid">
+                    <div class="result-item">
+                        <span class="label">Total Internal</span>
+                        <span class="value" id="disp-internal">0 / 300</span>
+                    </div>
+                    <div class="result-item highlight-blue">
+                        <span class="label">CIA Score</span>
+                        <span class="value" id="disp-cia">0 / 40</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">ESE Contribution</span>
+                        <span class="value" id="disp-ese-conv">0 / 60</span>
+                        <small class="sub-value">(Raw: <span id="disp-ese-raw">0</span>/100)</small>
+                    </div>
+                    <div class="result-item highlight-main">
+                        <span class="label">Final Total</span>
+                        <span class="value" id="disp-total">0 / 100</span>
+                    </div>
+                </div>
+
+                <div class="grade-outcome">
+                    <div class="grade-box">
+                        <span>Grade</span>
+                        <h1 id="disp-grade">-</h1>
+                    </div>
+                    <div class="status-box" id="status-box">
+                        <span>Status</span>
+                        <h2 id="disp-status">-</h2>
+                    </div>
+                </div>
+
+                <div class="breakdown-details">
+                    <details>
+                        <summary>View Calculation Breakdown</summary>
+                        <ul id="calc-log">
+                            <li>Enter marks to see breakdown...</li>
+                        </ul>
+                    </details>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Student Portal. Built for B.Tech Regulations.</p>
+            <div class="legend" style="margin-top: 10px; font-size: 0.8rem; color: var(--text-dim);">
+                <p><strong>CIA:</strong> Continuous Internal Assessment | <strong>ESE:</strong> End Semester Examination
+                </p>
+            </div>
+        </footer>
+    </div>
+    <script src="main.js"></script>
+</body>
+
+</html>
