@@ -210,9 +210,46 @@ function calculateGrade() {
 document.getElementById('calc-btn').addEventListener('click', calculateGrade);
 
 document.getElementById('reset-btn').addEventListener('click', () => {
-    document.querySelectorAll('input').forEach(i => i.value = '');
-    document.getElementById('disp-status').innerText = '-';
-    document.getElementById('disp-grade').innerText = '-';
+    // 1. Clear Inputs
+    document.querySelectorAll('input').forEach(i => {
+        i.value = '';
+        i.parentElement.classList.remove('error'); // Remove validation errors
+    });
+
+    // 2. Reset Mini Results
+    const defaultMini = `<span>Converted:</span> <strong>0 / 100</strong>`;
+    document.getElementById('res-a1').innerHTML = defaultMini;
+    document.getElementById('res-a2').innerHTML = defaultMini;
+    document.getElementById('res-a3').innerHTML = defaultMini;
+
+    // Reset ESE Mini Result
+    document.getElementById('res-ese').innerHTML = `<span>Converted (60%):</span> <strong>- / 60</strong>`;
+
+    // 3. Reset Final Summary
+    document.getElementById('disp-internal').innerText = '0 / 300';
+    document.getElementById('disp-cia').innerText = '0 / 40';
+    document.getElementById('disp-ese-conv').innerText = '0 / 60';
+    document.getElementById('disp-ese-raw').innerText = '0';
+    document.getElementById('disp-total').innerText = '0 / 100';
+
+    // 4. Reset Status & Grade
+    const statusEl = document.getElementById('disp-status');
+    const gradeEl = document.getElementById('disp-grade');
+
+    statusEl.innerText = '-';
+    statusEl.className = ''; // Remove pass/fail classes
+    statusEl.style.color = '';
+
+    gradeEl.innerText = '-';
+    gradeEl.style.color = '';
+
+    // 5. Hide Warnings
+    document.getElementById('ese-warning').style.display = 'none';
+
+    // 6. Reset Log
+    document.getElementById('calc-log').innerHTML = '<li>Enter marks to see breakdown...</li>';
+
+    // 7. Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 

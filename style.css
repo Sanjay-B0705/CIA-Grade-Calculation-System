@@ -448,8 +448,43 @@ header {
         color: #000;
     }
 
-    #disp-grade,
-    #disp-status {
-        color: #000 !important;
+
+    /* Mode Selection Styles */
+    .mode-options {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
     }
-}
+
+    .mode-option {
+        flex: 1;
+        min-width: 200px;
+        cursor: pointer;
+    }
+
+    .mode-option input {
+        display: none;
+    }
+
+    .mode-label {
+        display: block;
+        padding: 1rem;
+        text-align: center;
+        background: var(--glass-shiny);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s;
+        color: var(--text-dim);
+    }
+
+    .mode-option input:checked+.mode-label {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 4px 15px hsla(var(--primary-hue), 90%, 50%, 0.4);
+        border-color: var(--primary);
+    }
+
+    .mode-option:hover .mode-label {
+        border-color: var(--primary-light);
+    }
