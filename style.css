@@ -454,16 +454,25 @@ header {
         display: flex;
         gap: 1rem;
         flex-wrap: wrap;
+        /* Already wraps, but ensuring container width */
+        justify-content: center;
+        /* Center the buttons */
     }
 
     .mode-option {
         flex: 1;
-        min-width: 200px;
+        min-width: 250px;
+        /* Force stack on small screens */
         cursor: pointer;
+        position: relative;
+        /* Context for any absolute positioning */
     }
 
     .mode-option input {
-        display: none;
+        /* Hide the native radio button completely visually */
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
     }
 
     .mode-label {
