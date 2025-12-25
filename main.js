@@ -35,6 +35,18 @@ function updateMiniResults() {
     const a3_total = Math.min(a3_conv + a3_assign + a3_cluster, 100);
     document.getElementById('res-a3').innerHTML = `<span>Mark:</span> <strong>${a3_total.toFixed(2)}</strong>`;
 
+    // ESE Mini Result
+    const ese_raw = getValue('ese-raw');
+    const eseInput = document.getElementById('ese-raw');
+
+    // Only show if user has started typing
+    if (eseInput.value.trim() !== '') {
+        const ese_conv = (ese_raw / 100) * 60;
+        document.getElementById('res-ese').innerHTML = `<span>Converted (60%):</span> <strong>${ese_conv.toFixed(2)} / 60</strong>`;
+    } else {
+        document.getElementById('res-ese').innerHTML = `<span>Converted (60%):</span> <strong>- / 60</strong>`;
+    }
+
     return {
         a1: a1_total,
         a2: a2_total,
@@ -43,6 +55,26 @@ function updateMiniResults() {
 }
 
 function calculateGrade() {
+    // Validation: Check if all internal assessment inputs are provided
+    const requiredIds = [
+        'a1-raw', 'a1-notes',
+        'a2-raw', 'a2-mcq', 'a2-cluster',
+        'a3-raw', 'a3-assign', 'a3-cluster'
+    ];
+
+    let allFilled = true;
+    for (const id of requiredIds) {
+        if (document.getElementById(id).value.trim() === '') {
+            allFilled = false;
+            break;
+        }
+    }
+
+    if (!allFilled) {
+        alert("Please enter data for all Internal Assessment marks (Assessment 1, 2, and 3) to calculate.");
+        return;
+    }
+
     // 1. Get Assessments
     const scores = updateMiniResults();
 
@@ -51,125 +83,124 @@ function calculateGrade() {
     // Rounding logic: Standard Rounding (x.5 rounds up)
     const cia_score = Math.round((total_internal / 300) * 40); // Out of 40
 
-    // 3. ESE Calculation
+    // 3. ESE Calculation Check
+    const eseInput = document.getElementById('ese-raw');
+    const hasEse = eseInput.value.trim() !== '';
     const ese_raw = getValue('ese-raw');
-    // Minimum 40 pass check
-    if (ese_raw < 40 && ese_raw > 0) {
-        document.getElementById('ese-warning').style.display = 'block';
-    } else {
+
+    // Display Internal Stats (Always)
+    document.getElementById('disp-internal').innerText = `${total_internal.toFixed(1)} / 300`;
+    document.getElementById('disp-cia').innerText = `${cia_score} / 40`;
+
+    // 4. Mode Selection: Internal Only vs Overall
+    if (!hasEse) {
+        // Internal Only Mode
+        document.getElementById('disp-ese-conv').innerText = "-";
+        document.getElementById('disp-ese-raw').innerText = "-";
+        document.getElementById('disp-total').innerText = "-";
+
+        document.getElementById('disp-grade').innerText = "-";
+        document.getElementById('disp-status').innerText = "Pending ESE";
+        document.getElementById('disp-status').className = ""; // Neutral
+        document.getElementById('disp-status').style.color = "var(--text-dim)";
+
         document.getElementById('ese-warning').style.display = 'none';
-    }
 
-    // Convert ESE to 60 weightage
-    const ese_weighted = (ese_raw / 100) * 60;
-
-    // Final Total Calculation
-    // Rounding logic for final mark as requested: 50 above (>.5) -> greater, 50 below (<.5) -> lower
-    const final_total_raw = cia_score + ese_weighted;
-    const final_total = Math.round(final_total_raw);
-
-    // 4. Pass/Fail Logic
-    let status = "PASS";
-    let statusClass = "pass";
-
-    // Condition 1: ESE Min 40
-    if (ese_raw < 40) {
-        status = "FAIL (ESE < 40)";
-        statusClass = "fail";
-    }
-    // Aggregate condition removed as requested
-
-    // 5. Grade Logic (Custom Ranges)
-    // Ranges from transcript:
-    // O (Outstanding): >= 91
-    // A+ (Excellent): 81 - 90 (Transcript says 81 greater, 91 less)
-    // A (Very Good): 71 - 80
-    // B+ (Good): 61 - 70
-    // B (Below Average): 55 - 60
-    // C+ (Average): 45 - 54
-    // C (Pass): 40 - 44
-    // U (Fail): < 40
-    // W (Withdraw): Not calculable from marks, but reserved.
-
-    let grade = "U";
-    let gradeText = "Reappear";
-
-    // If ESE fail, grade is U
-    if (statusClass === "fail") {
-        grade = "U";
-        gradeText = "Reappear";
+        // Log
+        const log = document.getElementById('calc-log');
+        log.innerHTML = `
+            <li><strong>A1:</strong> ${scores.a1.toFixed(1)}</li>
+            <li><strong>A2:</strong> ${scores.a2.toFixed(1)}</li>
+            <li><strong>A3:</strong> ${scores.a3.toFixed(1)}</li>
+            <li>---------------------------</li>
+            <li><strong>Internal Total:</strong> ${total_internal.toFixed(1)} / 300</li>
+            <li><strong>CIA Score:</strong> ${cia_score} / 40</li>
+            <li><em>* Enter End Semester Mark to see Final Grade.</em></li>
+        `;
     } else {
-        const t = final_total;
+        // Overall Mode (Full Calculation)
 
-        if (t >= 91) {
-            grade = "O";
-            gradeText = "Outstanding";
-        } else if (t >= 81) {
-            grade = "A+";
-            gradeText = "Excellent";
-        } else if (t >= 71) {
-            grade = "A";
-            gradeText = "Very Good";
-        } else if (t >= 61) {
-            grade = "B+";
-            gradeText = "Good";
-        } else if (t >= 55) {
-            grade = "B";
-            gradeText = "Below Average";
-        } else if (t >= 45) {
-            grade = "C+";
-            gradeText = "Average";
-        } else if (t >= 40) {
-            grade = "C";
-            gradeText = "Pass";
+        // Minimum 40 pass check for ESE
+        if (ese_raw < 40) {
+            document.getElementById('ese-warning').style.display = 'block';
         } else {
-            grade = "U";
-            gradeText = "Reappear";
-            status = "FAIL (Total < 40)";
+            document.getElementById('ese-warning').style.display = 'none';
+        }
+
+        // Convert ESE to 60 weightage
+        const ese_weighted = (ese_raw / 100) * 60;
+
+        // Final Total Calculation
+        const final_total_raw = cia_score + ese_weighted;
+        const final_total = Math.round(final_total_raw);
+
+        // Pass/Fail Logic
+        let status = "PASS";
+        let statusClass = "pass";
+
+        if (ese_raw < 40) {
+            status = "FAIL (ESE < 40)";
             statusClass = "fail";
         }
+
+        // Grade Logic
+        let grade = "U";
+        let gradeText = "Reappear";
+
+        if (statusClass === "fail") {
+            grade = "U";
+            gradeText = "Reappear";
+        } else {
+            const t = final_total;
+            if (t >= 91) { grade = "O"; gradeText = "Outstanding"; }
+            else if (t >= 81) { grade = "A+"; gradeText = "Excellent"; }
+            else if (t >= 71) { grade = "A"; gradeText = "Very Good"; }
+            else if (t >= 61) { grade = "B+"; gradeText = "Good"; }
+            else if (t >= 55) { grade = "B"; gradeText = "Below Average"; }
+            else if (t >= 45) { grade = "C+"; gradeText = "Average"; }
+            else if (t >= 40) { grade = "C"; gradeText = "Pass"; }
+            else {
+                grade = "U";
+                gradeText = "Reappear";
+                status = "FAIL (Total < 40)";
+                statusClass = "fail";
+            }
+        }
+
+        // Display Full Stats
+        document.getElementById('disp-ese-conv').innerText = `${ese_weighted.toFixed(2)} / 60`;
+        document.getElementById('disp-ese-raw').innerText = ese_raw;
+        document.getElementById('disp-total').innerText = `${final_total} / 100`;
+
+        // Display Grade/Status
+        const statusEl = document.getElementById('disp-status');
+        const gradeEl = document.getElementById('disp-grade');
+
+        statusEl.innerText = status;
+        statusEl.className = statusClass;
+        statusEl.style.color = ""; // Reset inline color (use class)
+
+        gradeEl.innerHTML = `${grade}<div style="font-size:1rem; margin-top:0.5rem; opacity:0.8">${gradeText}</div>`;
+
+        if (grade === "U" || statusClass === "fail") {
+            gradeEl.style.color = "var(--danger)";
+        } else {
+            gradeEl.style.color = "var(--success)";
+        }
+
+        // Breakdown Log
+        const log = document.getElementById('calc-log');
+        log.innerHTML = `
+            <li><strong>A1:</strong> ${scores.a1.toFixed(1)}</li>
+            <li><strong>A2:</strong> ${scores.a2.toFixed(1)}</li>
+            <li><strong>A3:</strong> ${scores.a3.toFixed(1)}</li>
+            <li>---------------------------</li>
+            <li><strong>Internal Total:</strong> ${total_internal.toFixed(1)} / 300</li>
+            <li><strong>CIA Score:</strong> ${cia_score} / 40</li>
+            <li><strong>ESE Weighted:</strong> (${ese_raw} / 100) * 60 = ${ese_weighted.toFixed(2)}</li>
+            <li><strong>Final Total:</strong> Math.round(${cia_score} + ${ese_weighted.toFixed(2)}) = <strong>${final_total}</strong></li>
+        `;
     }
-
-    // 6. Display Stats
-    document.getElementById('disp-internal').innerText = `${total_internal.toFixed(1)} / 300`;
-    document.getElementById('disp-cia').innerText = `${cia_score} / 40`; // Rounded
-    document.getElementById('disp-ese-conv').innerText = `${ese_weighted.toFixed(2)} / 60`;
-    document.getElementById('disp-ese-raw').innerText = ese_raw; // Raw
-    document.getElementById('disp-total').innerText = `${final_total} / 100`; // Rounded
-
-    // 7. Display Grade/Status
-    const statusEl = document.getElementById('disp-status');
-    const gradeEl = document.getElementById('disp-grade');
-
-    statusEl.innerText = status;
-    statusEl.className = statusClass;
-
-    gradeEl.innerText = `${grade}`;
-    // Add tooltip or small text for description if needed, or just append
-    // gradeEl.innerHTML = `${grade} <span style="font-size:0.4em; display:block; margin-top:5px">${gradeText}</span>`; 
-    // Let's keep it simple as requested, maybe just Grade letter. 
-    // Actually user audio said "O is outstanding", implying the mapping exists. 
-    // I'll show "O" and maybe putting the description below is nice.
-    gradeEl.innerHTML = `${grade}<div style="font-size:1rem; margin-top:0.5rem; opacity:0.8">${gradeText}</div>`;
-
-    if (grade === "U" || statusClass === "fail") {
-        gradeEl.style.color = "var(--danger)";
-    } else {
-        gradeEl.style.color = "var(--success)";
-    }
-
-    // 8. Breakdown Log
-    const log = document.getElementById('calc-log');
-    log.innerHTML = `
-        <li><strong>A1:</strong> ${scores.a1.toFixed(1)}</li>
-        <li><strong>A2:</strong> ${scores.a2.toFixed(1)}</li>
-        <li><strong>A3:</strong> ${scores.a3.toFixed(1)}</li>
-        <li>---------------------------</li>
-        <li><strong>Internal Total:</strong> ${total_internal.toFixed(1)} / 300</li>
-        <li><strong>CIA Score:</strong> Math.round(${((total_internal / 300) * 40).toFixed(2)}) = <strong>${cia_score}</strong></li>
-        <li><strong>ESE Weighted:</strong> (${ese_raw} / 100) * 60 = ${ese_weighted.toFixed(2)}</li>
-        <li><strong>Final Total:</strong> Math.round(${cia_score} + ${ese_weighted.toFixed(2)}) = <strong>${final_total}</strong></li>
-    `;
 
     // Scroll to result
     document.getElementById('final-result').scrollIntoView({ behavior: 'smooth' });
