@@ -485,6 +485,5 @@ header {
         border-color: var(--primary);
     }
 
-    .mode-option:hover .mode-label {
-        border-color: var(--primary-light);
-    }
+
+}

@@ -47,12 +47,32 @@ function updateMiniResults() {
         document.getElementById('res-ese').innerHTML = `<span>Converted (60%):</span> <strong>- / 60</strong>`;
     }
 
+
     return {
         a1: a1_total,
         a2: a2_total,
         a3: a3_total
     };
 }
+
+function toggleMode() {
+    const mode = document.querySelector('input[name="calc-mode"]:checked').value;
+    const assessmentCards = document.querySelectorAll('.assessment-card');
+    const directCard = document.getElementById('direct-entry-card');
+
+    if (mode === 'direct') {
+        assessmentCards.forEach(card => card.style.display = 'none');
+        directCard.style.display = 'block';
+    } else {
+        assessmentCards.forEach(card => card.style.display = 'block');
+        directCard.style.display = 'none';
+    }
+
+    // Clear logs when switching
+    document.getElementById('calc-log').innerHTML = '<li>Mode changed. Enter marks to see breakdown...</li>';
+    document.getElementById('res-ese').innerHTML = `<span>Converted (60%):</span> <strong>- / 60</strong>`;
+}
+
 
 function calculateGrade() {
     // Validation: Check if all internal assessment inputs are provided
@@ -202,12 +222,194 @@ function calculateGrade() {
         `;
     }
 
+
+    // Scroll to result
+    document.getElementById('final-result').scrollIntoView({ behavior: 'smooth' });
+}
+
+function calculateGradeNew() {
+    const mode = document.querySelector('input[name="calc-mode"]:checked').value;
+    let cia_score = 0;
+    let total_internal_display = 0; // For display purposes
+    let calculation_breakdown_html = "";
+
+    if (mode === 'detailed') {
+        // Detailed Mode (Original Logic)
+
+        // Validation: Check if all internal assessment inputs are provided
+        const requiredIds = [
+            'a1-raw', 'a1-notes',
+            'a2-raw', 'a2-mcq', 'a2-cluster',
+            'a3-raw', 'a3-assign', 'a3-cluster'
+        ];
+
+        let allFilled = true;
+        for (const id of requiredIds) {
+            if (document.getElementById(id).value.trim() === '') {
+                allFilled = false;
+                break;
+            }
+        }
+
+        if (!allFilled) {
+            alert("Please enter data for all Internal Assessment marks to calculate, or switch to 'Direct Internal Entry' mode.");
+            return;
+        }
+
+        // 1. Get Assessments
+        const scores = updateMiniResults();
+
+        // 2. CIA Calculation
+        const total_internal = scores.a1 + scores.a2 + scores.a3; // Out of 300
+        total_internal_display = total_internal;
+        // Rounding logic: Standard Rounding (x.5 rounds up)
+        cia_score = Math.round((total_internal / 300) * 40); // Out of 40
+
+        calculation_breakdown_html += `
+            <li><strong>A1:</strong> ${scores.a1.toFixed(1)}</li>
+            <li><strong>A2:</strong> ${scores.a2.toFixed(1)}</li>
+            <li><strong>A3:</strong> ${scores.a3.toFixed(1)}</li>
+            <li>---------------------------</li>
+            <li><strong>Internal Total:</strong> ${total_internal.toFixed(1)} / 300</li>
+            <li><strong>CIA Score:</strong> Math.round(${((total_internal / 300) * 40).toFixed(2)}) = <strong>${cia_score}</strong></li>
+        `;
+
+    } else {
+        // Direct Entry Mode
+        const directInput = document.getElementById('direct-cia');
+        if (directInput.value.trim() === '') {
+            alert("Please enter your Total CIA Mark (out of 40).");
+            return;
+        }
+
+        const raw_direct = parseFloat(directInput.value);
+        if (raw_direct < 0 || raw_direct > 40) {
+            alert("CIA Mark must be between 0 and 40.");
+            return;
+        }
+
+        cia_score = raw_direct;
+        total_internal_display = (cia_score / 40) * 300; // Reverse engineer for display (approx)
+
+        calculation_breakdown_html += `
+            <li><strong>Direct Entry Mode</strong></li>
+            <li><strong>CIA Score:</strong> ${cia_score} / 40</li>
+        `;
+    }
+
+    // 3. ESE Calculation Check
+    const eseInput = document.getElementById('ese-raw');
+    const hasEse = eseInput.value.trim() !== '';
+    const ese_raw = getValue('ese-raw');
+
+    // Display Internal Stats (Always)
+    document.getElementById('disp-internal').innerText = `${total_internal_display.toFixed(1)} / 300`;
+    document.getElementById('disp-cia').innerText = `${cia_score} / 40`;
+
+    // 4. Mode Selection: Internal Only vs Overall
+    if (!hasEse) {
+        // Internal Only Mode
+        document.getElementById('disp-ese-conv').innerText = "-";
+        document.getElementById('disp-ese-raw').innerText = "-";
+        document.getElementById('disp-total').innerText = "-";
+
+        document.getElementById('disp-grade').innerText = "-";
+        document.getElementById('disp-status').innerText = "Pending ESE";
+        document.getElementById('disp-status').className = ""; // Neutral
+        document.getElementById('disp-status').style.color = "var(--text-dim)";
+
+        document.getElementById('ese-warning').style.display = 'none';
+
+        // Log
+        const log = document.getElementById('calc-log');
+        log.innerHTML = calculation_breakdown_html + `<li><em>* Enter End Semester Mark to see Final Grade.</em></li>`;
+
+    } else {
+        // Overall Mode (Full Calculation)
+
+        // Minimum 40 pass check for ESE
+        if (ese_raw < 40) {
+            document.getElementById('ese-warning').style.display = 'block';
+        } else {
+            document.getElementById('ese-warning').style.display = 'none';
+        }
+
+        // Convert ESE to 60 weightage
+        const ese_weighted = (ese_raw / 100) * 60;
+
+        // Final Total Calculation
+        const final_total_raw = cia_score + ese_weighted;
+        const final_total = Math.round(final_total_raw);
+
+        // Pass/Fail Logic
+        let status = "PASS";
+        let statusClass = "pass";
+
+        if (ese_raw < 40) {
+            status = "FAIL (ESE < 40)";
+            statusClass = "fail";
+        }
+
+        // Grade Logic
+        let grade = "U";
+        let gradeText = "Reappear";
+
+        if (statusClass === "fail") {
+            grade = "U";
+            gradeText = "Reappear";
+        } else {
+            const t = final_total;
+            if (t >= 91) { grade = "O"; gradeText = "Outstanding"; }
+            else if (t >= 81) { grade = "A+"; gradeText = "Excellent"; }
+            else if (t >= 71) { grade = "A"; gradeText = "Very Good"; }
+            else if (t >= 61) { grade = "B+"; gradeText = "Good"; }
+            else if (t >= 55) { grade = "B"; gradeText = "Below Average"; }
+            else if (t >= 45) { grade = "C+"; gradeText = "Average"; }
+            else if (t >= 40) { grade = "C"; gradeText = "Pass"; }
+            else {
+                grade = "U";
+                gradeText = "Reappear";
+                status = "FAIL (Total < 40)";
+                statusClass = "fail";
+            }
+        }
+
+        // Display Full Stats
+        document.getElementById('disp-ese-conv').innerText = `${ese_weighted.toFixed(2)} / 60`;
+        document.getElementById('disp-ese-raw').innerText = ese_raw;
+        document.getElementById('disp-total').innerText = `${final_total} / 100`;
+
+        // Display Grade/Status
+        const statusEl = document.getElementById('disp-status');
+        const gradeEl = document.getElementById('disp-grade');
+
+        statusEl.innerText = status;
+        statusEl.className = statusClass;
+        statusEl.style.color = ""; // Reset inline color (use class)
+
+        gradeEl.innerHTML = `${grade}<div style="font-size:1rem; margin-top:0.5rem; opacity:0.8">${gradeText}</div>`;
+
+        if (grade === "U" || statusClass === "fail") {
+            gradeEl.style.color = "var(--danger)";
+        } else {
+            gradeEl.style.color = "var(--success)";
+        }
+
+        // Breakdown Log
+        const log = document.getElementById('calc-log');
+        log.innerHTML = calculation_breakdown_html + `
+            <li><strong>ESE Weighted:</strong> (${ese_raw} / 100) * 60 = ${ese_weighted.toFixed(2)}</li>
+            <li><strong>Final Total:</strong> Math.round(${cia_score} + ${ese_weighted.toFixed(2)}) = <strong>${final_total}</strong></li>
+        `;
+    }
+
     // Scroll to result
     document.getElementById('final-result').scrollIntoView({ behavior: 'smooth' });
 }
 
 // Event Listeners
-document.getElementById('calc-btn').addEventListener('click', calculateGrade);
+document.getElementById('calc-btn').addEventListener('click', calculateGradeNew);
+
 
 document.getElementById('reset-btn').addEventListener('click', () => {
     // 1. Clear Inputs
@@ -249,7 +451,14 @@ document.getElementById('reset-btn').addEventListener('click', () => {
     // 6. Reset Log
     document.getElementById('calc-log').innerHTML = '<li>Enter marks to see breakdown...</li>';
 
-    // 7. Scroll to top
+    // 7. Reset Mode to Detailed (Default)
+    const detailedRadio = document.querySelector('input[value="detailed"]');
+    if (detailedRadio) {
+        detailedRadio.checked = true;
+        toggleMode(); // Trigger UI update (hide direct, show assessments)
+    }
+
+    // 8. Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
