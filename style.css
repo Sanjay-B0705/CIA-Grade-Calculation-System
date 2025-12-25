@@ -447,66 +447,69 @@ header {
     .result-item .value {
         color: #000;
     }
-
-
-    /* Mode Selection Styles */
-    .mode-options {
-        display: flex;
-        flex-direction: column;
-        /* Stack vertically for clarity as requested/implied by 'mobile' issues */
-        gap: 0.5rem;
-        margin-top: 1rem;
-    }
-
-    .mode-option {
-        display: flex;
-        align-items: center;
-        padding: 1rem;
-        background: var(--glass-shiny);
-        border: 1px solid var(--glass-border);
-        border-radius: 12px;
-        cursor: pointer;
-        transition: all 0.2s;
-        /* Reset any flex shrink logic */
-        min-width: 0;
-    }
-
-    .mode-option:hover {
-        border-color: var(--primary-light);
-    }
-
-    .mode-option input {
-        /* Make Radio Visible */
-        display: inline-block;
-        flex-shrink: 0;
-        width: 1.2rem;
-        height: 1.2rem;
-        margin-right: 1rem;
-        accent-color: var(--primary);
-        position: static;
-        opacity: 1;
-        pointer-events: auto;
-    }
-
-    .mode-label {
-        /* Reset Button Styles to Text Only */
-        display: inline-block;
-        padding: 0;
-        background: transparent;
-        border: none;
-        text-align: left;
-        color: var(--text-dim);
-        font-weight: 600;
-        /* Prevent text wrapping if needed, but allow wrapping on mobile */
-        white-space: normal;
-    }
-
-    /* Highlight text when selected */
-    .mode-option input:checked+.mode-label {
-        color: var(--primary-light);
-        background: transparent;
-        box-shadow: none;
-        border: none;
-    }
-
 }
+
+
+/* Mode Selection Styles */
+.mode-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.mode-option {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    /* Use gap for spacing between radio and text */
+    padding: 1rem;
+    background: var(--glass-shiny);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mode-option:hover {
+    border-color: var(--primary-light);
+}
+
+.mode-option input {
+    /* Make Radio Visible */
+    display: inline-block;
+    appearance: auto;
+    /* Ensure native appearance */
+    width: 1.2rem;
+    height: 1.2rem;
+    accent-color: var(--primary);
+    flex-shrink: 0;
+    /* Prevent squishing on small screens */
+    margin: 0;
+    /* Using gap on parent instead */
+    cursor: pointer;
+}
+
+.mode-label {
+    /* Reset Button Styles to Text Only */
+    display: inline-block;
+    padding: 0;
+    background: transparent;
+    border: none;
+    text-align: left;
+    color: var(--text-dim);
+    font-weight: 600;
+    line-height: 1.4;
+    white-space: normal;
+    /* Allow wrapping if needed */
+}
+
+/* Highlight text when selected */
+.mode-option input:checked+.mode-label {
+    color: var(--primary-light);
+    background: transparent;
+    box-shadow: none;
+    border: none;
+}
+
+```
