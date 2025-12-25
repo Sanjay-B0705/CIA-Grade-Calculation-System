@@ -452,47 +452,61 @@ header {
     /* Mode Selection Styles */
     .mode-options {
         display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-        /* Already wraps, but ensuring container width */
-        justify-content: center;
-        /* Center the buttons */
+        flex-direction: column;
+        /* Stack vertically for clarity as requested/implied by 'mobile' issues */
+        gap: 0.5rem;
+        margin-top: 1rem;
     }
 
     .mode-option {
-        flex: 1;
-        min-width: 250px;
-        /* Force stack on small screens */
-        cursor: pointer;
-        position: relative;
-        /* Context for any absolute positioning */
-    }
-
-    .mode-option input {
-        /* Hide the native radio button completely visually */
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
-    }
-
-    .mode-label {
-        display: block;
+        display: flex;
+        align-items: center;
         padding: 1rem;
-        text-align: center;
         background: var(--glass-shiny);
         border: 1px solid var(--glass-border);
         border-radius: 12px;
-        font-weight: 600;
-        transition: all 0.3s;
+        cursor: pointer;
+        transition: all 0.2s;
+        /* Reset any flex shrink logic */
+        min-width: 0;
+    }
+
+    .mode-option:hover {
+        border-color: var(--primary-light);
+    }
+
+    .mode-option input {
+        /* Make Radio Visible */
+        display: inline-block;
+        flex-shrink: 0;
+        width: 1.2rem;
+        height: 1.2rem;
+        margin-right: 1rem;
+        accent-color: var(--primary);
+        position: static;
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .mode-label {
+        /* Reset Button Styles to Text Only */
+        display: inline-block;
+        padding: 0;
+        background: transparent;
+        border: none;
+        text-align: left;
         color: var(--text-dim);
+        font-weight: 600;
+        /* Prevent text wrapping if needed, but allow wrapping on mobile */
+        white-space: normal;
     }
 
+    /* Highlight text when selected */
     .mode-option input:checked+.mode-label {
-        background: var(--primary);
-        color: white;
-        box-shadow: 0 4px 15px hsla(var(--primary-hue), 90%, 50%, 0.4);
-        border-color: var(--primary);
+        color: var(--primary-light);
+        background: transparent;
+        box-shadow: none;
+        border: none;
     }
-
 
 }
