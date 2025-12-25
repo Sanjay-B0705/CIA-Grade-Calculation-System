@@ -1,6 +1,6 @@
-# PMIST Student CIA & Grade Calculation Portal
+# Student CIA & Grade Calculation Portal
 
-A responsive web application designed for **UG B.Tech students of PMIST** to verify their Continuous Internal Assessment (CIA) marks, End Semester Examination (ESE) results, and final Grade outcome based on official examination regulations.
+A responsive web application designed for **UG B.Tech students** to verify their Continuous Internal Assessment (CIA) marks, End Semester Examination (ESE) results, and final Grade outcome based on official examination regulations.
 
 ## 🚀 Live Demo
 Access the portal via: [https://Sanjay-B0705.github.io/CIA-Grade-Calculation-System/](https://Sanjay-B0705.github.io/CIA-Grade-Calculation-System/)
