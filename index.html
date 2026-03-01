@@ -63,12 +63,12 @@
                     <span class="badge">Max 100</span>
                 </div>
                 <div class="input-group">
-                    <label for="a1-raw">Raw Marks (Max 30)</label>
-                    <input type="number" id="a1-raw" min="0" max="30" placeholder="0-30">
+                    <label for="a1-raw">First Assessment Test (Max 100)</label>
+                    <input type="number" id="a1-raw" min="0" max="100" placeholder="0-100">
                     <small class="hint">Converts to 90</small>
                 </div>
                 <div class="input-group">
-                    <label for="a1-notes">Cluster / Notes (Max 10)</label>
+                    <label for="a1-notes">Handwritten Notes (Max 10)</label>
                     <input type="number" id="a1-notes" min="0" max="10" placeholder="0-10">
                 </div>
                 <div class="result-mini" id="res-a1">
@@ -83,16 +83,16 @@
                     <span class="badge">Max 100</span>
                 </div>
                 <div class="input-group">
-                    <label for="a2-raw">Raw Marks (Max 50)</label>
-                    <input type="number" id="a2-raw" min="0" max="50" placeholder="0-50">
+                    <label for="a2-raw">Mid-Term Test (Max 100)</label>
+                    <input type="number" id="a2-raw" min="0" max="100" placeholder="0-100">
                     <small class="hint">Converts to 70</small>
                 </div>
                 <div class="input-group">
-                    <label for="a2-mcq">MCQ Test (Max 20)</label>
+                    <label for="a2-mcq">Objective Type Test (Max 20)</label>
                     <input type="number" id="a2-mcq" min="0" max="20" placeholder="0-20">
                 </div>
                 <div class="input-group">
-                    <label for="a2-cluster">Cluster / Classwork (Max 10)</label>
+                    <label for="a2-cluster">Handwritten Notes (Max 10)</label>
                     <input type="number" id="a2-cluster" min="0" max="10" placeholder="0-10">
                 </div>
                 <div class="result-mini" id="res-a2">
@@ -107,16 +107,16 @@
                     <span class="badge">Max 100</span>
                 </div>
                 <div class="input-group">
-                    <label for="a3-raw">Raw Marks (Max 100)</label>
+                    <label for="a3-raw">Model Examination (Max 100)</label>
                     <input type="number" id="a3-raw" min="0" max="100" placeholder="0-100">
                     <small class="hint">Converts to 70</small>
                 </div>
                 <div class="input-group">
-                    <label for="a3-assign">Assignment (Max 20)</label>
+                    <label for="a3-assign">Quiz/Seminar/Mini-project (Max 20)</label>
                     <input type="number" id="a3-assign" min="0" max="20" placeholder="0-20">
                 </div>
                 <div class="input-group">
-                    <label for="a3-cluster">Cluster / Classwork (Max 10)</label>
+                    <label for="a3-cluster">Handwritten Notes (Max 10)</label>
                     <input type="number" id="a3-cluster" min="0" max="10" placeholder="0-10">
                 </div>
                 <div class="result-mini" id="res-a3">
@@ -198,9 +198,15 @@
         </main>
 
         <footer>
-            <p>&copy; 2024 Student Portal. Built for B.Tech Regulations.</p>
-            <div class="legend" style="margin-top: 10px; font-size: 0.8rem; color: var(--text-dim);">
+            <p>&copy; 2024 Student Portal. Built for B.Tech Regulations 2024.</p>
+            <div class="legend" style="margin-top: 10px; font-size: 0.8rem; color: var(--text-dim); line-height: 1.6;">
                 <p><strong>CIA:</strong> Continuous Internal Assessment | <strong>ESE:</strong> End Semester Examination
+                </p>
+                <p style="margin-top: 8px;">
+                    <strong>Letter Grade :</strong> O - 10 | A+ - 9 | A - 8 | B+ - 7 | B - 6 | C - 5 | U - 0 | W - 0
+                </p>
+                <p style="margin-top: 8px; opacity: 0.8;">
+                    <strong>Attendance Grade :</strong> O &ge; 95% | M &ge; 85% and &lt; 95% | S &ge; 75% and &lt; 85%
                 </p>
             </div>
         </footer>

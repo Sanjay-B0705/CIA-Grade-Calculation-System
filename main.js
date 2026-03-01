@@ -11,9 +11,8 @@ function updateMiniResults() {
     // A1
     const a1_raw = getValue('a1-raw');
     const a1_notes = getValue('a1-notes');
-    // Rule: Raw/30 * 90 + Notes
-    // Wait, prompt says Raw(30) -> 90. So Raw * 3.
-    const a1_conv = (a1_raw / 30) * 90;
+    // Rule: (Raw/100 * 90) + Notes
+    const a1_conv = (a1_raw / 100) * 90;
     const a1_total = Math.min(a1_conv + a1_notes, 100);
     document.getElementById('res-a1').innerHTML = `<span>Mark:</span> <strong>${a1_total.toFixed(2)}</strong>`;
 
@@ -21,8 +20,8 @@ function updateMiniResults() {
     const a2_raw = getValue('a2-raw');
     const a2_mcq = getValue('a2-mcq');
     const a2_cluster = getValue('a2-cluster');
-    // Rule: (Raw/50 * 100 * 0.7) -> (Raw/50 * 70) = Raw * 1.4
-    const a2_conv = (a2_raw / 50) * 70;
+    // Rule: (Raw/100 * 70) + Objective(20) + Notes(10)
+    const a2_conv = (a2_raw / 100) * 70;
     const a2_total = Math.min(a2_conv + a2_mcq + a2_cluster, 100);
     document.getElementById('res-a2').innerHTML = `<span>Mark:</span> <strong>${a2_total.toFixed(2)}</strong>`;
 
@@ -164,24 +163,23 @@ function calculateGrade() {
         }
 
         // Grade Logic
-        let grade = "U";
-        let gradeText = "Reappear";
+        let grade = "RA";
+        let gradeText = "Reappearance";
 
         if (statusClass === "fail") {
-            grade = "U";
-            gradeText = "Reappear";
+            grade = "RA";
+            gradeText = "Reappearance";
         } else {
             const t = final_total;
-            if (t >= 91) { grade = "O"; gradeText = "Outstanding"; }
-            else if (t >= 81) { grade = "A+"; gradeText = "Excellent"; }
-            else if (t >= 71) { grade = "A"; gradeText = "Very Good"; }
-            else if (t >= 61) { grade = "B+"; gradeText = "Good"; }
-            else if (t >= 55) { grade = "B"; gradeText = "Below Average"; }
-            else if (t >= 45) { grade = "C+"; gradeText = "Average"; }
-            else if (t >= 40) { grade = "C"; gradeText = "Pass"; }
+            if (t >= 90) { grade = "O"; gradeText = "Outstanding"; }
+            else if (t >= 80) { grade = "A+"; gradeText = "Excellent"; }
+            else if (t >= 70) { grade = "A"; gradeText = "Very Good"; }
+            else if (t >= 60) { grade = "B+"; gradeText = "Good"; }
+            else if (t >= 50) { grade = "B"; gradeText = "Average"; }
+            else if (t >= 40) { grade = "C"; gradeText = "Satisfactory"; }
             else {
-                grade = "U";
-                gradeText = "Reappear";
+                grade = "RA";
+                gradeText = "Reappearance";
                 status = "FAIL (Total < 40)";
                 statusClass = "fail";
             }
@@ -202,7 +200,7 @@ function calculateGrade() {
 
         gradeEl.innerHTML = `${grade}<div style="font-size:1rem; margin-top:0.5rem; opacity:0.8">${gradeText}</div>`;
 
-        if (grade === "U" || statusClass === "fail") {
+        if (grade === "RA" || statusClass === "fail") {
             gradeEl.style.color = "var(--danger)";
         } else {
             gradeEl.style.color = "var(--success)";
@@ -229,6 +227,7 @@ function calculateGrade() {
 
 function calculateGradeNew() {
     const mode = document.querySelector('input[name="calc-mode"]:checked').value;
+
     let cia_score = 0;
     let total_internal_display = 0; // For display purposes
     let calculation_breakdown_html = "";
@@ -277,6 +276,7 @@ function calculateGradeNew() {
     } else {
         // Direct Entry Mode
         const directInput = document.getElementById('direct-cia');
+
         if (directInput.value.trim() === '') {
             alert("Please enter your Total CIA Mark (out of 40).");
             return;
@@ -289,7 +289,7 @@ function calculateGradeNew() {
         }
 
         cia_score = raw_direct;
-        total_internal_display = (cia_score / 40) * 300; // Reverse engineer for display (approx)
+        total_internal_display = (cia_score / 40) * 300;
 
         calculation_breakdown_html += `
             <li><strong>Direct Entry Mode</strong></li>
@@ -327,15 +327,15 @@ function calculateGradeNew() {
     } else {
         // Overall Mode (Full Calculation)
 
-        // Minimum 40 pass check for ESE
+        // Minimum pass check for ESE
         if (ese_raw < 40) {
             document.getElementById('ese-warning').style.display = 'block';
         } else {
             document.getElementById('ese-warning').style.display = 'none';
         }
 
-        // Convert ESE to 60 weightage
-        const ese_weighted = (ese_raw / 100) * 60;
+        // Convert ESE
+        let ese_weighted = (ese_raw / 100) * 60;
 
         // Final Total Calculation
         const final_total_raw = cia_score + ese_weighted;
@@ -346,29 +346,28 @@ function calculateGradeNew() {
         let statusClass = "pass";
 
         if (ese_raw < 40) {
-            status = "FAIL (ESE < 40)";
+            status = `FAIL (ESE < 40)`;
             statusClass = "fail";
         }
 
         // Grade Logic
-        let grade = "U";
-        let gradeText = "Reappear";
+        let grade = "RA";
+        let gradeText = "Reappearance";
 
         if (statusClass === "fail") {
-            grade = "U";
-            gradeText = "Reappear";
+            grade = "RA";
+            gradeText = "Reappearance";
         } else {
             const t = final_total;
-            if (t >= 91) { grade = "O"; gradeText = "Outstanding"; }
-            else if (t >= 81) { grade = "A+"; gradeText = "Excellent"; }
-            else if (t >= 71) { grade = "A"; gradeText = "Very Good"; }
-            else if (t >= 61) { grade = "B+"; gradeText = "Good"; }
-            else if (t >= 55) { grade = "B"; gradeText = "Below Average"; }
-            else if (t >= 45) { grade = "C+"; gradeText = "Average"; }
-            else if (t >= 40) { grade = "C"; gradeText = "Pass"; }
+            if (t >= 90) { grade = "O"; gradeText = "Outstanding"; }
+            else if (t >= 80) { grade = "A+"; gradeText = "Excellent"; }
+            else if (t >= 70) { grade = "A"; gradeText = "Very Good"; }
+            else if (t >= 60) { grade = "B+"; gradeText = "Good"; }
+            else if (t >= 50) { grade = "B"; gradeText = "Average"; }
+            else if (t >= 40) { grade = "C"; gradeText = "Satisfactory"; }
             else {
-                grade = "U";
-                gradeText = "Reappear";
+                grade = "RA";
+                gradeText = "Reappearance";
                 status = "FAIL (Total < 40)";
                 statusClass = "fail";
             }
@@ -389,7 +388,7 @@ function calculateGradeNew() {
 
         gradeEl.innerHTML = `${grade}<div style="font-size:1rem; margin-top:0.5rem; opacity:0.8">${gradeText}</div>`;
 
-        if (grade === "U" || statusClass === "fail") {
+        if (grade === "RA" || statusClass === "fail") {
             gradeEl.style.color = "var(--danger)";
         } else {
             gradeEl.style.color = "var(--success)";
@@ -397,8 +396,8 @@ function calculateGradeNew() {
 
         // Breakdown Log
         const log = document.getElementById('calc-log');
-        log.innerHTML = calculation_breakdown_html + `
-            <li><strong>ESE Weighted:</strong> (${ese_raw} / 100) * 60 = ${ese_weighted.toFixed(2)}</li>
+        let ese_log_text = `<li><strong>ESE Weighted:</strong> (${ese_raw} / 100) * 60 = ${ese_weighted.toFixed(2)}</li>`;
+        log.innerHTML = calculation_breakdown_html + ese_log_text + `
             <li><strong>Final Total:</strong> Math.round(${cia_score} + ${ese_weighted.toFixed(2)}) = <strong>${final_total}</strong></li>
         `;
     }
