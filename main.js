@@ -11,28 +11,28 @@ function updateMiniResults() {
     // A1
     const a1_raw = getValue('a1-raw');
     const a1_notes = getValue('a1-notes');
-    // Rule: (Raw/100 * 90) + Notes
-    const a1_conv = (a1_raw / 100) * 90;
+    // Rule: (Raw/30) * 90 + Notes
+    const a1_conv = (a1_raw / 30) * 90;
     const a1_total = Math.min(a1_conv + a1_notes, 100);
-    document.getElementById('res-a1').innerHTML = `<span>Mark:</span> <strong>${a1_total.toFixed(2)}</strong>`;
+    document.getElementById('res-a1').innerHTML = `<span>Out of 100:</span> <strong>${a1_total.toFixed(2)}</strong>`;
 
     // A2
     const a2_raw = getValue('a2-raw');
     const a2_mcq = getValue('a2-mcq');
     const a2_cluster = getValue('a2-cluster');
-    // Rule: (Raw/100 * 70) + Objective(20) + Notes(10)
-    const a2_conv = (a2_raw / 100) * 70;
+    // Rule: (Raw/50 * 70) + Assignment(20) + Notes(10)
+    const a2_conv = (a2_raw / 50) * 70;
     const a2_total = Math.min(a2_conv + a2_mcq + a2_cluster, 100);
-    document.getElementById('res-a2').innerHTML = `<span>Mark:</span> <strong>${a2_total.toFixed(2)}</strong>`;
+    document.getElementById('res-a2').innerHTML = `<span>Out of 100:</span> <strong>${a2_total.toFixed(2)}</strong>`;
 
     // A3
     const a3_raw = getValue('a3-raw');
     const a3_assign = getValue('a3-assign');
     const a3_cluster = getValue('a3-cluster');
-    // Rule: Raw/100 * 70 = Raw * 0.7
+    // Rule: (Raw/100 * 70) + Assignment(20) + Notes(10)
     const a3_conv = (a3_raw / 100) * 70;
     const a3_total = Math.min(a3_conv + a3_assign + a3_cluster, 100);
-    document.getElementById('res-a3').innerHTML = `<span>Mark:</span> <strong>${a3_total.toFixed(2)}</strong>`;
+    document.getElementById('res-a3').innerHTML = `<span>Out of 100:</span> <strong>${a3_total.toFixed(2)}</strong>`;
 
     // ESE Mini Result
     const ese_raw = getValue('ese-raw');
@@ -418,7 +418,7 @@ document.getElementById('reset-btn').addEventListener('click', () => {
     });
 
     // 2. Reset Mini Results
-    const defaultMini = `<span>Converted:</span> <strong>0 / 100</strong>`;
+    const defaultMini = `<span>Out of 100:</span> <strong>0.00</strong>`;
     document.getElementById('res-a1').innerHTML = defaultMini;
     document.getElementById('res-a2').innerHTML = defaultMini;
     document.getElementById('res-a3').innerHTML = defaultMini;
