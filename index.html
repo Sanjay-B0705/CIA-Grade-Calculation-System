@@ -23,35 +23,64 @@
                 <h1></h1>
                 <span class="subtitle">Student Academic Portal</span>
             </div>
-            <p class="description">UG B.Tech CIA & Grade Calculation System</p>
+            <p class="description">CIA & Grade Calculation System</p>
         </header>
 
         <main class="grid-layout">
             <!-- Mode Selection -->
             <div class="card glass-card wide-card mode-selector">
                 <div class="card-header">
-                    <h2>Calculation Mode</h2>
+                    <h2>Calculation Mode For CIA</h2>
                 </div>
                 <div class="mode-options">
                     <label class="mode-option">
                         <input type="radio" name="calc-mode" value="detailed" checked onchange="toggleMode()">
-                        <span class="mode-label">Calculate from Assessments</span>
+                        <span class="mode-label">Calculate from Assessments (CIA Mark) <small
+                                style="opacity: 0.8; font-weight: normal;">(Regulation 2024-B.TECH Only)</small></span>
                     </label>
                     <label class="mode-option">
                         <input type="radio" name="calc-mode" value="direct" onchange="toggleMode()">
-                        <span class="mode-label">Direct Internal Entry</span>
+                        <span class="mode-label">Direct Internal Entry (CIA Mark)</span>
                     </label>
                 </div>
             </div>
-
+            <!-- Configuration Card -->
+            <div class="card glass-card wide-card" id="config-card" style="display: none;">
+                <div class="card-header">
+                    <h2>Calculation Rules</h2>
+                    <span class="badge" style="cursor: pointer;" onclick="resetConfig()">Reset Default</span>
+                </div>
+                <div class="input-group-row" style="display: flex; flex-wrap: wrap; gap: 1rem;">
+                    <div class="input-group" style="flex: 1; min-width: 140px;">
+                        <label for="config-cia-weight">CIA Weightage</label>
+                        <input type="number" id="config-cia-weight" value="40" min="0" max="100"
+                            onchange="updateUIFromConfig()">
+                    </div>
+                    <div class="input-group" style="flex: 1; min-width: 140px;">
+                        <label for="config-ese-weight">ESE Weightage</label>
+                        <input type="number" id="config-ese-weight" value="60" min="0" max="100"
+                            onchange="updateUIFromConfig()">
+                    </div>
+                    <div class="input-group" style="flex: 1; min-width: 140px;">
+                        <label for="config-ese-pass">ESE Pass Mark</label>
+                        <input type="number" id="config-ese-pass" value="40" min="0" max="100"
+                            onchange="updateUIFromConfig()">
+                    </div>
+                    <div class="input-group" style="flex: 1; min-width: 140px;">
+                        <label for="config-total-pass">Total Pass Mark</label>
+                        <input type="number" id="config-total-pass" value="50" min="0" max="100"
+                            onchange="updateUIFromConfig()">
+                    </div>
+                </div>
+            </div>
             <!-- Direct Entry Card (Hidden by default) -->
             <div class="card glass-card wide-card" id="direct-entry-card" style="display: none;">
                 <div class="card-header">
                     <h2>Direct Internal Mark</h2>
-                    <span class="badge">Max 40</span>
+                    <span class="badge" id="badge-cia-direct">Max 40</span>
                 </div>
                 <div class="input-group">
-                    <label for="direct-cia">Enter Total CIA Mark (Out of 40)</label>
+                    <label for="direct-cia" id="label-direct-cia">Enter Total CIA Mark (Out of 40)</label>
                     <input type="number" id="direct-cia" min="0" max="40" placeholder="0-40">
                 </div>
             </div>
@@ -128,7 +157,7 @@
             <div class="card glass-card wide-card">
                 <div class="card-header">
                     <h2>End Semester Exam (ESE)</h2>
-                    <span class="badge">Pass ≥ 40</span>
+                    <span class="badge" id="badge-ese-pass">Pass ≥ 40</span>
                 </div>
                 <div class="input-group-row">
                     <div class="input-group">
@@ -140,7 +169,7 @@
                     * Minimum 40 marks required in ESE to pass.
                 </div>
                 <div class="result-mini" id="res-ese">
-                    <span>Converted (60%):</span> <strong>- / 60</strong>
+                    <span id="label-ese-mini">Converted (60%):</span> <strong>- / 60</strong>
                 </div>
             </div>
 
@@ -198,15 +227,12 @@
         </main>
 
         <footer>
-            <p>&copy; 2024 Student Portal. Built for B.Tech Regulations 2024.</p>
+            <p>&copy; 2024 Student Portal. Built for PMIST B.Tech Regulations 2024.</p>
             <div class="legend" style="margin-top: 10px; font-size: 0.8rem; color: var(--text-dim); line-height: 1.6;">
                 <p><strong>CIA:</strong> Continuous Internal Assessment | <strong>ESE:</strong> End Semester Examination
                 </p>
                 <p style="margin-top: 8px;">
-                    <strong>Letter Grade :</strong> O - 10 | A+ - 9 | A - 8 | B+ - 7 | B - 6 | C - 5 | U - 0 | W - 0
-                </p>
-                <p style="margin-top: 8px; opacity: 0.8;">
-                    <strong>Attendance Grade :</strong> O &ge; 95% | M &ge; 85% and &lt; 95% | S &ge; 75% and &lt; 85%
+                    <strong>Letter Grade :</strong> O (10) | A+ (9) | A (8) | B+ (7) | B (6) | C (5) | RA/SA (0) | W (0)
                 </p>
             </div>
         </footer>

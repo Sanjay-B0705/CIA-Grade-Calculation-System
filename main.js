@@ -1,3 +1,65 @@
+function getConfig() {
+    const modeEl = document.querySelector('input[name="calc-mode"]:checked');
+    const mode = modeEl ? modeEl.value : 'detailed';
+    
+    if (mode === 'direct') {
+        return {
+            ciaWeight: parseFloat(document.getElementById('config-cia-weight').value) || 40,
+            eseWeight: parseFloat(document.getElementById('config-ese-weight').value) || 60,
+            esePass: parseFloat(document.getElementById('config-ese-pass').value) || 40,
+            totalPass: parseFloat(document.getElementById('config-total-pass').value) || 50
+        };
+    } else {
+        return {
+            ciaWeight: 40,
+            eseWeight: 60,
+            esePass: 40,
+            totalPass: 50
+        };
+    }
+}
+
+function updateUIFromConfig() {
+    const config = getConfig();
+    
+    const badgeCiaDirect = document.getElementById('badge-cia-direct');
+    if(badgeCiaDirect) badgeCiaDirect.innerText = `Max ${config.ciaWeight}`;
+    
+    const labelDirectCia = document.getElementById('label-direct-cia');
+    if(labelDirectCia) labelDirectCia.innerText = `Enter Total CIA Mark (Out of ${config.ciaWeight})`;
+    
+    const directCia = document.getElementById('direct-cia');
+    if(directCia) {
+        directCia.setAttribute('max', config.ciaWeight);
+        directCia.setAttribute('placeholder', `0-${config.ciaWeight}`);
+    }
+    
+    const badgeEsePass = document.getElementById('badge-ese-pass');
+    if(badgeEsePass) badgeEsePass.innerText = `Pass ≥ ${config.esePass}`;
+    
+    const eseWarning = document.getElementById('ese-warning');
+    if(eseWarning) eseWarning.innerText = `* Minimum ${config.esePass} marks required in ESE to pass.`;
+    
+    const labelEseMini = document.getElementById('label-ese-mini');
+    if(labelEseMini) labelEseMini.innerText = `Converted (${config.eseWeight}%):`;
+    
+    updateMiniResults();
+    if(document.getElementById('disp-status').innerText !== "-") {
+        calculateGradeNew();
+    }
+}
+
+function resetConfig() {
+    const ciaEl = document.getElementById('config-cia-weight');
+    if (ciaEl) {
+        ciaEl.value = 40;
+        document.getElementById('config-ese-weight').value = 60;
+        document.getElementById('config-ese-pass').value = 40;
+        document.getElementById('config-total-pass').value = 50;
+        updateUIFromConfig();
+    }
+}
+
 function getValue(id) {
     const val = parseFloat(document.getElementById(id).value);
     return isNaN(val) ? 0 : val;
@@ -39,11 +101,12 @@ function updateMiniResults() {
     const eseInput = document.getElementById('ese-raw');
 
     // Only show if user has started typing
+    const config = getConfig();
     if (eseInput.value.trim() !== '') {
-        const ese_conv = (ese_raw / 100) * 60;
-        document.getElementById('res-ese').innerHTML = `<span>Converted (60%):</span> <strong>${ese_conv.toFixed(2)} / 60</strong>`;
+        const ese_conv = (ese_raw / 100) * config.eseWeight;
+        document.getElementById('res-ese').innerHTML = `<span id="label-ese-mini">Converted (${config.eseWeight}%):</span> <strong>${ese_conv.toFixed(2)} / ${config.eseWeight}</strong>`;
     } else {
-        document.getElementById('res-ese').innerHTML = `<span>Converted (60%):</span> <strong>- / 60</strong>`;
+        document.getElementById('res-ese').innerHTML = `<span id="label-ese-mini">Converted (${config.eseWeight}%):</span> <strong>- / ${config.eseWeight}</strong>`;
     }
 
 
@@ -58,18 +121,24 @@ function toggleMode() {
     const mode = document.querySelector('input[name="calc-mode"]:checked').value;
     const assessmentCards = document.querySelectorAll('.assessment-card');
     const directCard = document.getElementById('direct-entry-card');
+    const configCard = document.getElementById('config-card');
 
     if (mode === 'direct') {
         assessmentCards.forEach(card => card.style.display = 'none');
         directCard.style.display = 'block';
+        if (configCard) configCard.style.display = 'block';
     } else {
         assessmentCards.forEach(card => card.style.display = 'block');
         directCard.style.display = 'none';
+        if (configCard) configCard.style.display = 'none';
     }
 
+    updateUIFromConfig();
+
     // Clear logs when switching
+    const config = getConfig();
     document.getElementById('calc-log').innerHTML = '<li>Mode changed. Enter marks to see breakdown...</li>';
-    document.getElementById('res-ese').innerHTML = `<span>Converted (60%):</span> <strong>- / 60</strong>`;
+    document.getElementById('res-ese').innerHTML = `<span id="label-ese-mini">Converted (${config.eseWeight}%):</span> <strong>- / ${config.eseWeight}</strong>`;
 }
 
 
@@ -226,6 +295,7 @@ function calculateGrade() {
 }
 
 function calculateGradeNew() {
+    const config = getConfig();
     const mode = document.querySelector('input[name="calc-mode"]:checked').value;
 
     let cia_score = 0;
@@ -262,7 +332,7 @@ function calculateGradeNew() {
         const total_internal = scores.a1 + scores.a2 + scores.a3; // Out of 300
         total_internal_display = total_internal;
         // Rounding logic: Standard Rounding (x.5 rounds up)
-        cia_score = Math.round((total_internal / 300) * 40); // Out of 40
+        cia_score = Math.round((total_internal / 300) * config.ciaWeight); // Out of config.ciaWeight
 
         calculation_breakdown_html += `
             <li><strong>A1:</strong> ${scores.a1.toFixed(1)}</li>
@@ -270,7 +340,7 @@ function calculateGradeNew() {
             <li><strong>A3:</strong> ${scores.a3.toFixed(1)}</li>
             <li>---------------------------</li>
             <li><strong>Internal Total:</strong> ${total_internal.toFixed(1)} / 300</li>
-            <li><strong>CIA Score:</strong> Math.round(${((total_internal / 300) * 40).toFixed(2)}) = <strong>${cia_score}</strong></li>
+            <li><strong>CIA Score:</strong> Math.round(${((total_internal / 300) * config.ciaWeight).toFixed(2)}) = <strong>${cia_score}</strong></li>
         `;
 
     } else {
@@ -278,22 +348,22 @@ function calculateGradeNew() {
         const directInput = document.getElementById('direct-cia');
 
         if (directInput.value.trim() === '') {
-            alert("Please enter your Total CIA Mark (out of 40).");
+            alert(`Please enter your Total CIA Mark (out of ${config.ciaWeight}).`);
             return;
         }
 
         const raw_direct = parseFloat(directInput.value);
-        if (raw_direct < 0 || raw_direct > 40) {
-            alert("CIA Mark must be between 0 and 40.");
+        if (raw_direct < 0 || raw_direct > config.ciaWeight) {
+            alert(`CIA Mark must be between 0 and ${config.ciaWeight}.`);
             return;
         }
 
         cia_score = raw_direct;
-        total_internal_display = (cia_score / 40) * 300;
+        total_internal_display = (cia_score / config.ciaWeight) * 300;
 
         calculation_breakdown_html += `
             <li><strong>Direct Entry Mode</strong></li>
-            <li><strong>CIA Score:</strong> ${cia_score} / 40</li>
+            <li><strong>CIA Score:</strong> ${cia_score} / ${config.ciaWeight}</li>
         `;
     }
 
@@ -304,7 +374,7 @@ function calculateGradeNew() {
 
     // Display Internal Stats (Always)
     document.getElementById('disp-internal').innerText = `${total_internal_display.toFixed(1)} / 300`;
-    document.getElementById('disp-cia').innerText = `${cia_score} / 40`;
+    document.getElementById('disp-cia').innerText = `${cia_score} / ${config.ciaWeight}`;
 
     // 4. Mode Selection: Internal Only vs Overall
     if (!hasEse) {
@@ -328,14 +398,14 @@ function calculateGradeNew() {
         // Overall Mode (Full Calculation)
 
         // Minimum pass check for ESE
-        if (ese_raw < 40) {
+        if (ese_raw < config.esePass) {
             document.getElementById('ese-warning').style.display = 'block';
         } else {
             document.getElementById('ese-warning').style.display = 'none';
         }
 
         // Convert ESE
-        let ese_weighted = (ese_raw / 100) * 60;
+        let ese_weighted = (ese_raw / 100) * config.eseWeight;
 
         // Final Total Calculation
         const final_total_raw = cia_score + ese_weighted;
@@ -345,8 +415,11 @@ function calculateGradeNew() {
         let status = "PASS";
         let statusClass = "pass";
 
-        if (ese_raw < 40) {
-            status = `FAIL (ESE < 40)`;
+        if (ese_raw < config.esePass) {
+            status = `FAIL (ESE < ${config.esePass})`;
+            statusClass = "fail";
+        } else if (final_total < config.totalPass) {
+            status = `FAIL (Total < ${config.totalPass})`;
             statusClass = "fail";
         }
 
@@ -359,22 +432,26 @@ function calculateGradeNew() {
             gradeText = "Reappearance";
         } else {
             const t = final_total;
-            if (t >= 90) { grade = "O"; gradeText = "Outstanding"; }
-            else if (t >= 80) { grade = "A+"; gradeText = "Excellent"; }
-            else if (t >= 70) { grade = "A"; gradeText = "Very Good"; }
-            else if (t >= 60) { grade = "B+"; gradeText = "Good"; }
-            else if (t >= 50) { grade = "B"; gradeText = "Average"; }
-            else if (t >= 40) { grade = "C"; gradeText = "Satisfactory"; }
+            if (t >= 91) { grade = "O"; gradeText = "Outstanding"; }
+            else if (t >= 81) { grade = "A+"; gradeText = "Excellent"; }
+            else if (t >= 71) { grade = "A"; gradeText = "Very Good"; }
+            else if (t >= 61) { grade = "B+"; gradeText = "Good"; }
+            else if (t >= 56) { grade = "B"; gradeText = "Above Average"; }
+            else if (t >= 50) { 
+                grade = config.totalPass < 50 ? "C+" : "C"; 
+                gradeText = config.totalPass < 50 ? "Average" : "Pass";
+            }
+            else if (t >= 40) { grade = "C"; gradeText = "Pass"; }
             else {
                 grade = "RA";
                 gradeText = "Reappearance";
-                status = "FAIL (Total < 40)";
+                status = `FAIL (Total < ${config.totalPass})`;
                 statusClass = "fail";
             }
         }
 
         // Display Full Stats
-        document.getElementById('disp-ese-conv').innerText = `${ese_weighted.toFixed(2)} / 60`;
+        document.getElementById('disp-ese-conv').innerText = `${ese_weighted.toFixed(2)} / ${config.eseWeight}`;
         document.getElementById('disp-ese-raw').innerText = ese_raw;
         document.getElementById('disp-total').innerText = `${final_total} / 100`;
 
@@ -396,7 +473,7 @@ function calculateGradeNew() {
 
         // Breakdown Log
         const log = document.getElementById('calc-log');
-        let ese_log_text = `<li><strong>ESE Weighted:</strong> (${ese_raw} / 100) * 60 = ${ese_weighted.toFixed(2)}</li>`;
+        let ese_log_text = `<li><strong>ESE Weighted:</strong> (${ese_raw} / 100) * ${config.eseWeight} = ${ese_weighted.toFixed(2)}</li>`;
         log.innerHTML = calculation_breakdown_html + ese_log_text + `
             <li><strong>Final Total:</strong> Math.round(${cia_score} + ${ese_weighted.toFixed(2)}) = <strong>${final_total}</strong></li>
         `;
@@ -413,8 +490,10 @@ document.getElementById('calc-btn').addEventListener('click', calculateGradeNew)
 document.getElementById('reset-btn').addEventListener('click', () => {
     // 1. Clear Inputs
     document.querySelectorAll('input').forEach(i => {
-        i.value = '';
-        i.parentElement.classList.remove('error'); // Remove validation errors
+        if(!i.id.startsWith('config-') && i.type !== 'radio') {
+            i.value = '';
+            i.parentElement.classList.remove('error'); // Remove validation errors
+        }
     });
 
     // 2. Reset Mini Results
@@ -424,12 +503,13 @@ document.getElementById('reset-btn').addEventListener('click', () => {
     document.getElementById('res-a3').innerHTML = defaultMini;
 
     // Reset ESE Mini Result
-    document.getElementById('res-ese').innerHTML = `<span>Converted (60%):</span> <strong>- / 60</strong>`;
+    const config = getConfig();
+    document.getElementById('res-ese').innerHTML = `<span id="label-ese-mini">Converted (${config.eseWeight}%):</span> <strong>- / ${config.eseWeight}</strong>`;
 
     // 3. Reset Final Summary
     document.getElementById('disp-internal').innerText = '0 / 300';
-    document.getElementById('disp-cia').innerText = '0 / 40';
-    document.getElementById('disp-ese-conv').innerText = '0 / 60';
+    document.getElementById('disp-cia').innerText = `0 / ${config.ciaWeight}`;
+    document.getElementById('disp-ese-conv').innerText = `0 / ${config.eseWeight}`;
     document.getElementById('disp-ese-raw').innerText = '0';
     document.getElementById('disp-total').innerText = '0 / 100';
 
@@ -491,3 +571,5 @@ if (!document.getElementById('print-btn')) {
     controls.appendChild(printBtn);
 }
 
+
+window.addEventListener('DOMContentLoaded', updateUIFromConfig);
